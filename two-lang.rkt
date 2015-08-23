@@ -38,13 +38,14 @@
         ;[(char-numeric? (strcar s)) (v s "Int")] [(equal? (strcar s) #\") (v s "String")] 
         [else s]))
 
-(define (parse-expr lst) (foldr (λ (l r)
-  (cond [(empty? r) (cons l r)]
-        [(equal? l "=") (list "Infix=" r)]
-        [(and (list? r) (equal? (car r) "Infix=")) 
-         (begin (set! ruls (push ruls (list l (second r)))) '())]
-        [(list? r) (cons l r)]
-        [else (printf "ERROR: Combination, `~a` . `~a`, does not exist.~n"
-                      l r)])) '() lst))
+(define (parse-expr lst) (foldr (λ (lx r)
+  (let ([l (if (list? lx) (parse-expr lx) lx)])
+    (cond [(empty? r) (cons l r)]
+          [(equal? l "=") (list "Infix=" r)]
+          [(and (list? r) (equal? (car r) "Infix=")) 
+           (begin (set! ruls (push ruls (list l (second r)))) '())]
+          [(list? r) (cons l r)]
+          [else (printf "ERROR: Combination, `~a` . `~a`, does not exist.~n"
+                        l r)]))) '() lst))
 
 (define (parse l) (parse-expr (map lex (check-parens (string-split-spec l)))))
