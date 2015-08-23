@@ -18,7 +18,8 @@
 (define (strcar str) (car (string->list str)))
 (define (find-eq a ac-expr lst) (findf (λ (x) (equal? a (ac-expr x))) lst))
 
-(define funs (list (fn "=" 2) (fn "add" 2)))
+(define funs (list (fn "add" 2)))
+(define ruls '())
 
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'str) (if (equal? s #\") (push (second n) '()) (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
@@ -38,8 +39,12 @@
         [else s]))
 
 (define (parse-expr lst) (foldr (λ (l r)
-  (cond [(list? r) (cons l r)]
+  (cond [(empty? r) (cons l r)]
+        [(equal? l "=") (list "Infix=" r)]
+        [(and (list? r) (equal? (car r) "Infix=")) 
+         (begin (set! ruls (push ruls (list l (second r)))) '())]
+        [(list? r) (cons l r)]
         [else (printf "ERROR: Combination, `~a` . `~a`, does not exist.~n"
                       l r)])) '() lst))
 
-(define (parse l) (map lex (check-parens (string-split-spec l))))
+(define (parse l) (parse-expr (map lex (check-parens (string-split-spec l)))))
