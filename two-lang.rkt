@@ -25,6 +25,7 @@
 (define test1 "(a b) = (1 2)")
 (define test2 "(a $a) = (b $a)")
 (define test3 "(d (($a Int))) = (d $a)") ; d 1
+(define test4 "(+ (($a Int) ($b Int))) = res $a + $b")
 
 ; surrounds string with quotation marks
 (define (quoti lst) (append (list #\") (push lst #\")))
@@ -74,7 +75,8 @@
     (cond [(empty? r) (cons l r)] [(equal? l "=") (list "Infix=" r)]
           [(and (list? r) (equal? (car r) "Infix=")) 
            (begin (set! ruls (push ruls (list l (second r)))) '())]
-          [(and (equal? l "TXT") (equal? (cadar r) "String")) (fprintf (current-output-port) "~a" (caar r))]
+          ;[(and (equal? l "TXT") (equal? (cadar r) "String")) (fprintf (current-output-port) "~a" (caar r))]
+          [(and (equal? l "car") (list? r)) (car r)] [(and (equal? l "cdr") (list? r)) (cdr r)]
           [(ormap (λ (x) (equiv? (list l r) (car x))) ruls) (rewrite (list l r) (findf (λ (x) (equiv? (list l r) (car x))) ruls))]
           [(list? r) (cons l r)]
           [else (printf "ERROR: Combination, `~a` . `~a`, does not exist.~n"
