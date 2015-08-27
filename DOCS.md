@@ -101,6 +101,17 @@ In the following sections, various concepts will be explained that can be create
 
 ## Infix functions
 
+At first, it may seem as though `(($a Int) + ($b Int)) = ...` would work as a definition for an infix `+`.  However, this is untrue, because as mentioned before, the left argument of a rule must have only two elements.  two-lang parses its input as if there is an operator between every item.  Because of this, all patterns that are two be matched have to have only two arguments.
 
+Instead of this, another solution is possible.  The infix function will be split into two different rules.  One to match `+ Int` and another to match `Int (+ Int)`:
 
+```
+(+ (($a Int))) = Infix+ ($a Int)
+(($a Int) (Infix+ $b)) = add ($a Int) $b
+```
 
+This example will be walked through with the expression `1 + 2`.
+
+First, `+ ((2 Int))` matches the first pattern.  What is returned is `Infix+ (2 Int)`.  The reason why the literal is copied over just to be put into another association with `Int` is for type-checking.  If the entirety of `(Lit Type)` were selected to be `$a`, then any type would be allowed for the first argument.  This makes it so `Int` is the only allowed type.
+
+The next rule is matched when giving another integer.  The expression before matching is `(1 Int) (Infix+ 2)`.  This matches the second rule, giving `add 1 2`.  Also notice the same type-checking happens for the new `$a`.  It doesn't happen for `$b` because that was already checked in the last rule.  This is the final form of `1 + 2` according to these rules.
