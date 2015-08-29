@@ -65,7 +65,7 @@ There is one caveat to remember.  When wanting to match a literal, remember that
 (inc ((1 Int))) = 2
 ```
 
-This expects the string `inc 1` to become `(2 Int)`.  
+This expects the string `inc 1` to become `(2 Int)`.  However, this is untrue.  Because all literals are expanded, the above pattern becomes `(inc (((1 Int) Int))) = 2`, which is not what is needed.  Instead, the correct way would be `(inc (1)) = 2`.
 
 ## Variables
 
