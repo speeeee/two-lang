@@ -59,6 +59,14 @@ One of the builtin symbols in two-lang is the `=` symbol.  As mentioned before, 
 
 What this means is that whenever `+ 1 1` is found, it is replaced with `2`.  This is the other major point of two-lang: the idea of pattern-matching.  When a pattern is matched, it is replaced with what the matched rule's output.  The other thing to notice is the fact that the left argument of `=` is a list of two items.  These two items are the left and right arguments for the implied operator.  What this means is that the left operand must be `+` and the right operand must be `((1 Int) (1 Int))`.  As a result, the side of a rule that is to be matched *must* contain two items.  One for the left operand and one for the right operand.
 
+There is one caveat to remember.  When wanting to match a literal, remember that *all* literals are associated with their types.  To demonstrate, take this rule for `inc`:
+
+```
+(inc ((1 Int))) = 2
+```
+
+This expects the string `inc 1` to become `(2 Int)`.  
+
 ## Variables
 
 So far, there isn't much to do other than creating aliases using rule definitions.  However, variables allow for looser pattern matching.  Recall that all literals are automatically paired with their respective type.  Sometimes, it is desirable to isolate the literal for when the type itself is not needed.

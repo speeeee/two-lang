@@ -18,7 +18,7 @@
 (define (strcar str) (car (string->list str)))
 (define (find-eq a ac-expr lst) (findf (λ (x) (equal? a (ac-expr x))) lst))
 
-(define funs (list (list "Fun" "add" 2)))
+(define funs '())
 (define ruls '())
 
 (define test0 "TXT \"ffffff\"")
@@ -40,7 +40,7 @@
 
 ; equiv?: same as equal?, except all symbols prefixed by '$' are ignored.
 (define (equiv? a b) (and (= (length a) (length b))
-  (andmap (λ (x y) (cond [(and (list? x) (list? y)) (equiv? x y)] [(or (equal? x y) (equal? (strcar y) #\$)) #t]
+  (andmap (λ (x y) (cond [(and (list? x) (list? y)) (equiv? x y)] [(or (equal? x y) (and (string? y) (equal? (strcar y) #\$))) #t]
                          [else #f])) a b)))
 
 ; a = (l . r)
