@@ -1,5 +1,6 @@
 #lang racket/base
 (require racket/list)
+(require racket/string)
 
 (struct la (ins cont) #:transparent)
 (struct fn (name ins) #:transparent)
@@ -56,7 +57,7 @@
   (cond [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (quoti (pop (second n)))) '()) 
                                    (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
         [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\{ #\} #\[ #\] #\: #\')) (append n (list (list s)) (list '()))]
-        [(equal? s #\space) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
+        [(char-whitespace? s) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
 
 (define (check-parens lst) (foldl (λ (elt n)
   (if (or (empty? n) (not (equal? elt ")"))) (push n elt)
@@ -82,4 +83,18 @@
           [else (printf "ERROR: Combination, `~a` . `~a`, does not exist.~n"
                         l r)]))) '() lst))
 
+(define (get-all-text str in) (let ([x (read-char in)])
+  (if (eof-object? x) (list->string str) (get-all-text (push str x) in))))
+
 (define (parse l) (parse-expr (check-parens (map lex (string-split-spec l)))))
+(define (parse-out in out) (let ([x (get-all-text '() in)])
+  (fprintf out "~a" (parse x))))
+
+(define (main) (let ([args (vector->list (current-command-line-arguments))])
+  (if (= (length args) 1) (parse-out (open-input-file (string-join (list (second args) ".ktt") ""))
+                                     (open-output-file (string-join (list (second args) ".kto") "") #:exists 'replace)) (repl-main))))
+(define (repl-main) 
+  (display "> ") (let ([x (parse (read-line))])
+    #;(if (empty? (filter (λ (y) (not (empty? y))) x)) (displayln "EMPTY") (out-pseu x c)) 
+    (displayln x) (displayln "") (repl-main)))
+(main)
