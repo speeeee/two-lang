@@ -59,7 +59,7 @@ One of the builtin symbols in two-lang is the `=` symbol.  As mentioned before, 
 
 What this means is that whenever `+ 1 1` is found, it is replaced with `2`.  This is the other major point of two-lang: the idea of pattern-matching.  When a pattern is matched, it is replaced with what the matched rule's output.  The other thing to notice is the fact that the left argument of `=` is a list of two items.  These two items are the left and right arguments for the implied operator.  What this means is that the left operand must be `+` and the right operand must be `((1 Int) (1 Int))`.  As a result, the side of a rule that is to be matched *must* contain two items.  One for the left operand and one for the right operand.
 
-There is one caveat to remember.  When wanting to match a literal, remember that *all* literals are associated with their types.  To demonstrate, take this rule for `inc`:
+There is another thing to remember.  When wanting to match a literal, remember that *all* literals are associated with their types.  To demonstrate, take this rule for `inc`:
 
 ```
 (inc ((1 Int))) = 2
@@ -100,6 +100,10 @@ Because the pattern explicitly requires an `Int` as the type, the `String` remai
 ```
 
 Now, the pattern, `+ 1 2` can be matched, and it produces `1 + 2`.  However, because the types need to match in the pattern, something like `+ "Hello, " "world"` does not work.
+
+## A small note on ordering
+
+Recall that two-lang is a right-associative language.  Because of this, everything is not only read from right-to-left, but also *bottom-to-top*.  This means that the actual applied syntax should be written, then the rules.  This is an important idea to remember.
 
 This is the complete syntax of two-lang.
 
